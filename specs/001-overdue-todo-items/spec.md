@@ -8,6 +8,12 @@
 
 **Input**: User description: "Support for Overdue Todo Items: users need to easily identify and distinguish incomplete tasks that are past their due date, with automated coverage for overdue determination and display."
 
+## Clarifications
+
+### Session 2026-08-19
+
+- Q: When the app remains open across local midnight, when must overdue indicators update? → A: Automatically after local midnight without user action.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Identify Overdue Work (Priority: P1)
@@ -43,7 +49,7 @@ As a todo application user, I can complete an overdue todo and immediately see t
 ### Edge Cases
 
 - A due date equal to the user's current calendar date is due today, not overdue.
-- A todo becomes overdue when the user's local calendar date advances beyond its due date, without requiring the todo to be edited.
+- An open app automatically updates overdue indicators after the user's local calendar date advances past midnight, without refresh, reopening, editing, or other user action.
 - Changing an overdue todo's due date to today, a future date, or no date removes its overdue state.
 - Changing an incomplete todo's due date from today, a future date, or no date to a past date applies its overdue state.
 - Date comparisons use calendar dates rather than elapsed hours, so time-of-day and daylight-saving transitions do not make an item overdue early.
@@ -59,9 +65,9 @@ As a todo application user, I can complete an overdue todo and immediately see t
 - **FR-004**: The todo list MUST visually distinguish overdue todos from non-overdue todos while preserving the readability of the title, due date, status control, and actions.
 - **FR-005**: The overdue distinction MUST remain understandable without color alone and MUST meet the application's accessibility, light-theme, and dark-theme requirements.
 - **FR-006**: The displayed overdue state MUST update when a todo is completed, reopened, or has its due date changed.
-- **FR-007**: The displayed overdue state MUST reflect a change in the user's current calendar date without requiring the todo data to be edited.
+- **FR-007**: While the app remains open, the displayed overdue state MUST update automatically after the user's local calendar date advances past midnight, without refresh, reopening, editing, or other user action.
 - **FR-008**: Adding overdue presentation MUST NOT change the existing newest-first list order or any todo creation, editing, completion, reopening, or deletion behavior.
-- **FR-009**: Automated verification MUST cover overdue classification boundaries and the user-visible overdue presentation, including transitions caused by completion, reopening, and due-date changes.
+- **FR-009**: Automated verification MUST cover overdue classification boundaries and the user-visible overdue presentation, including transitions caused by completion, reopening, due-date changes, and the local calendar date advancing past midnight while the app remains open.
 
 ### Key Entities
 
@@ -74,7 +80,7 @@ As a todo application user, I can complete an overdue todo and immediately see t
 
 - **SC-001**: In acceptance testing, 100% of incomplete todos dated before the current date are identified as overdue, and 0% of completed, undated, due-today, or future-dated todos are identified as overdue.
 - **SC-002**: At least 90% of representative users can identify all overdue todos in a mixed list of at least 10 items within 5 seconds without manually comparing dates.
-- **SC-003**: In 100% of tested completion, reopening, and due-date-edit scenarios, the visible overdue state matches the todo's resulting status and due date immediately after the change is shown.
+- **SC-003**: In 100% of tested completion, reopening, due-date-edit, and open-app midnight-rollover scenarios, the visible overdue state matches the todo's resulting status, due date, and current local calendar date without additional user action.
 - **SC-004**: The overdue cue is perceivable and understandable in both supported themes, at documented viewport sizes, and when color perception is unavailable.
 - **SC-005**: All automated checks for overdue date boundaries and visible states pass, with no regression in existing todo workflows.
 
