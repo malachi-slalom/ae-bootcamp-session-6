@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { act, render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import App from '../App';
@@ -231,5 +231,95 @@ describe('App Component', () => {
     const themToggleAfter = screen.getByRole('button', { name: /Switch to light mode/ });
     fireEvent.click(themToggleAfter);
     expect(localStorage.getItem('todoAppTheme')).toBe('light');
+  });
+
+  test('updates overdue presentation after local midnight without refetching', async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date(2025, 11, 15, 23, 59, 50));
+    let requestCount = 0;
+    server.use(
+      rest.get('/api/todos', (req, res, ctx) => {
+        requestCount += 1;
+        return res(ctx.status(200), ctx.json([
+          {
+            id: 1,
+            title: 'Due Today',
+            dueDate: '2025-12-15',
+            completed: 0,
+            createdAt: '2025-12-01T00:00:00Z'
+          }
+        ]));
+      })
+    );
+
+    const { unmount } = render(<App />);
+    expect(await screen.findByText('Due Today')).toBeInTheDocument();
+    expect(screen.queryByText('Overdue')).not.toBeInTheDocument();
+    const requestCountBeforeRollover = requestCount;
+
+    act(() => {
+      jest.advanceTimersByTime(10000);
+    });
+
+    expect(screen.getByText('Overdue')).toBeVisible();
+    expect(requestCount).toBe(requestCountBeforeRollover);
+
+    unmount();
+    expect(jest.getTimerCount()).toBe(0);
+    jest.useRealTimers();
+  });
+
+  test('preserves toggle and edit transitions when mutation responses overlap', async () => {
+    const initialTodos = [
+      {
+        id: 1,
+        title: 'Complete overdue',
+        dueDate: '2020-01-01',
+        completed: 0,
+        createdAt: '2025-11-02T00:00:00Z'
+      },
+      {
+        id: 2,
+        title: 'Reschedule overdue',
+        dueDate: '2020-01-02',
+        completed: 0,
+        createdAt: '2025-11-01T00:00:00Z'
+      }
+    ];
+    server.use(
+      rest.get('/api/todos', (req, res, ctx) => (
+        res(ctx.status(200), ctx.json(initialTodos))
+      )),
+      rest.patch('/api/todos/1/toggle', (req, res, ctx) => (
+        res(ctx.delay(50), ctx.status(200), ctx.json({ ...initialTodos[0], completed: 1 }))
+      )),
+      rest.put('/api/todos/2', (req, res, ctx) => (
+        res(ctx.delay(10), ctx.status(200), ctx.json({
+          ...initialTodos[1],
+          dueDate: '2099-01-01'
+        }))
+      ))
+    );
+
+    render(<App />);
+    expect(await screen.findByText('Complete overdue')).toBeInTheDocument();
+    expect(screen.getAllByText('Overdue')).toHaveLength(2);
+
+    fireEvent.click(screen.getByLabelText('Mark "Complete overdue" as complete'));
+    fireEvent.click(screen.getByLabelText('Edit "Reschedule overdue"'));
+    fireEvent.change(screen.getByLabelText('Edit due date'), {
+      target: { value: '2099-01-01' }
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() => {
+      expect(screen.queryAllByText('Overdue')).toHaveLength(0);
+    });
+    expect(screen.getAllByRole('heading', { level: 3 }).map((heading) => heading.textContent)).toEqual([
+      'Complete overdue',
+      'Reschedule overdue',
+    ]);
+    expect(screen.getByLabelText('Mark "Complete overdue" as incomplete')).toBeChecked();
+    expect(screen.getByText(/January 1, 2099/)).toBeVisible();
   });
 });

@@ -4,12 +4,17 @@ import TodoList from './components/TodoList';
 import ThemeToggle from './components/ThemeToggle';
 import ConfirmDialog from './components/ConfirmDialog';
 import TodoService from './services/todoService';
+import {
+  getCurrentLocalDate,
+  getMillisecondsUntilNextLocalMidnight,
+} from './utils/dateUtils';
 import './App.css';
 
 function App() {
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentDate, setCurrentDate] = useState(getCurrentLocalDate);
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem('todoAppTheme');
     if (savedTheme) {
@@ -33,6 +38,22 @@ function App() {
     fetchTodos();
   }, []);
 
+  useEffect(() => {
+    let timeoutId;
+
+    const scheduleNextMidnight = (now = new Date()) => {
+      timeoutId = setTimeout(() => {
+        const currentTime = new Date();
+        setCurrentDate(getCurrentLocalDate(currentTime));
+        scheduleNextMidnight(currentTime);
+      }, getMillisecondsUntilNextLocalMidnight(now));
+    };
+
+    scheduleNextMidnight();
+
+    return () => clearTimeout(timeoutId);
+  }, []);
+
   const fetchTodos = async () => {
     try {
       setLoading(true);
@@ -50,7 +71,7 @@ function App() {
   const handleCreateTodo = async (title, dueDate) => {
     try {
       const newTodo = await TodoService.createTodo(title, dueDate);
-      setTodos([newTodo, ...todos]);
+      setTodos(currentTodos => [newTodo, ...currentTodos]);
       setError(null);
     } catch (err) {
       console.error('Error creating todo:', err);
@@ -62,7 +83,9 @@ function App() {
   const handleToggleTodo = async (todoId) => {
     try {
       const updatedTodo = await TodoService.toggleTodoStatus(todoId);
-      setTodos(todos.map(todo => (todo.id === todoId ? updatedTodo : todo)));
+      setTodos(currentTodos => (
+        currentTodos.map(todo => (todo.id === todoId ? updatedTodo : todo))
+      ));
       setError(null);
     } catch (err) {
       console.error('Error toggling todo:', err);
@@ -73,7 +96,9 @@ function App() {
   const handleEditTodo = async (todoId, title, dueDate) => {
     try {
       const updatedTodo = await TodoService.updateTodo(todoId, title, dueDate);
-      setTodos(todos.map(todo => (todo.id === todoId ? updatedTodo : todo)));
+      setTodos(currentTodos => (
+        currentTodos.map(todo => (todo.id === todoId ? updatedTodo : todo))
+      ));
       setError(null);
     } catch (err) {
       console.error('Error updating todo:', err);
@@ -91,7 +116,9 @@ function App() {
     try {
       setIsDeleting(true);
       await TodoService.deleteTodo(deletingTodoId);
-      setTodos(todos.filter(todo => todo.id !== deletingTodoId));
+      setTodos(currentTodos => (
+        currentTodos.filter(todo => todo.id !== deletingTodoId)
+      ));
       setShowDeleteConfirm(false);
       setDeletingTodoId(null);
       setError(null);
@@ -150,6 +177,7 @@ function App() {
               onToggle={handleToggleTodo}
               onEdit={handleEditTodo}
               onDelete={handleDeleteTodo}
+              currentDate={currentDate}
               isLoading={isDeleting}
             />
           )}

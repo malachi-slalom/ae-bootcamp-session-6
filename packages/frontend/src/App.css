@@ -328,6 +328,10 @@ p {
   background-color: var(--bg-primary);
 }
 
+.todo-card.overdue {
+  border-left: 4px solid var(--danger-color);
+}
+
 .todo-card.completed .todo-title {
   text-decoration: line-through;
   opacity: 0.6;
@@ -364,6 +368,16 @@ p {
   margin: 4px 0 0 0;
   font-size: 12px;
   color: var(--text-secondary);
+}
+
+.todo-overdue-label {
+  display: inline-block;
+  margin-left: var(--space-xs);
+  padding: 0 var(--space-xs);
+  border: 1px solid var(--danger-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-weight: 700;
 }
 
 .todo-actions {

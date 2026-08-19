@@ -99,4 +99,74 @@ describe('TodoCard Component', () => {
     
     expect(screen.queryByText(/Due:/)).not.toBeInTheDocument();
   });
+
+  it.each([
+    ['due today', { dueDate: '2025-12-25', completed: 0 }],
+    ['future-dated', { dueDate: '2025-12-26', completed: 0 }],
+    ['undated', { dueDate: null, completed: 0 }],
+    ['invalidly dated', { dueDate: '2025-02-30', completed: 0 }],
+    ['completed and past-due', { dueDate: '2025-12-24', completed: 1 }],
+  ])('does not mark a %s todo as overdue', (_, overrides) => {
+    const { container } = render(
+      <TodoCard
+        todo={{ ...mockTodo, ...overrides }}
+        {...mockHandlers}
+        currentDate="2025-12-25"
+        isLoading={false}
+      />
+    );
+
+    expect(screen.queryByText('Overdue')).not.toBeInTheDocument();
+    expect(container.querySelector('.todo-card')).not.toHaveClass('overdue');
+  });
+
+  it('labels and visually distinguishes an incomplete past-due todo', () => {
+    const { container } = render(
+      <TodoCard
+        todo={{ ...mockTodo, dueDate: '2025-12-24' }}
+        {...mockHandlers}
+        currentDate="2025-12-25"
+        isLoading={false}
+      />
+    );
+
+    expect(screen.getByText('Overdue')).toBeVisible();
+    expect(container.querySelector('.todo-card')).toHaveClass('overdue');
+    expect(screen.getByRole('checkbox')).toHaveAccessibleName(/Mark "Test Todo" as complete/);
+    expect(screen.getByLabelText('Edit "Test Todo"')).toBeEnabled();
+    expect(screen.getByLabelText('Delete "Test Todo"')).toBeEnabled();
+  });
+
+  it('reclassifies completion, reopening, and due-date changes on rerender', () => {
+    const renderCard = (todo) => (
+      <TodoCard
+        todo={todo}
+        {...mockHandlers}
+        currentDate="2025-12-25"
+        isLoading={false}
+      />
+    );
+    const pastDueTodo = { ...mockTodo, dueDate: '2025-12-24', completed: 0 };
+    const { container, rerender } = render(renderCard(pastDueTodo));
+
+    expect(screen.getByText('Overdue')).toBeVisible();
+    expect(screen.getByText(/December 24, 2025/)).toBeVisible();
+
+    rerender(renderCard({ ...pastDueTodo, completed: 1 }));
+    expect(screen.queryByText('Overdue')).not.toBeInTheDocument();
+    expect(container.querySelector('.todo-card')).toHaveClass('completed');
+    expect(screen.getByText(/December 24, 2025/)).toBeVisible();
+
+    rerender(renderCard(pastDueTodo));
+    expect(screen.getByText('Overdue')).toBeVisible();
+
+    for (const dueDate of ['2025-12-25', '2025-12-26', null]) {
+      rerender(renderCard({ ...pastDueTodo, dueDate }));
+      expect(screen.queryByText('Overdue')).not.toBeInTheDocument();
+    }
+
+    rerender(renderCard({ ...pastDueTodo, dueDate: '2025-12-23' }));
+    expect(screen.getByText('Overdue')).toBeVisible();
+    expect(screen.getByText(/December 23, 2025/)).toBeVisible();
+  });
 });

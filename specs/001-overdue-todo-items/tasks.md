@@ -23,7 +23,7 @@ description: "Implementation tasks for overdue todo item presentation"
 
 **Purpose**: Confirm the existing frontend test harness before feature work begins; no dependency or project scaffolding changes are required.
 
-- [ ] T001 Run the existing frontend test baseline using the test script in packages/frontend/package.json and record any pre-existing failures against specs/001-overdue-todo-items/quickstart.md
+- [X] T001 Run the existing frontend test baseline using the test script in packages/frontend/package.json and record any pre-existing failures against specs/001-overdue-todo-items/quickstart.md
 
 ---
 
@@ -45,19 +45,19 @@ No foundational code changes are required. The existing React state flow, REST r
 
 ### Tests for User Story 1
 
-- [ ] T002 [P] [US1] Add failing unit coverage for local date formatting, next-local-midnight delay, canonical date validation, leap days, and overdue boundaries in packages/frontend/src/utils/__tests__/dateUtils.test.js
-- [ ] T003 [P] [US1] Add failing presentation coverage for overdue text/class and past, today, future, absent, invalid, and completed due-date states in packages/frontend/src/components/__tests__/TodoCard.test.js
-- [ ] T004 [P] [US1] Add failing mixed-list coverage for forwarding one currentDate value to every card while preserving input order in packages/frontend/src/components/__tests__/TodoList.test.js
-- [ ] T005 [P] [US1] Add a failing modern-fake-timer integration test for initial local-date propagation, automatic midnight rollover, no rollover API request, and timeout cleanup in packages/frontend/src/__tests__/App.test.js
+- [X] T002 [P] [US1] Add failing unit coverage for local date formatting, next-local-midnight delay, canonical date validation, leap days, and overdue boundaries in packages/frontend/src/utils/__tests__/dateUtils.test.js
+- [X] T003 [P] [US1] Add failing presentation coverage for overdue text/class and past, today, future, absent, invalid, and completed due-date states in packages/frontend/src/components/__tests__/TodoCard.test.js
+- [X] T004 [P] [US1] Add failing mixed-list coverage for forwarding one currentDate value to every card while preserving input order in packages/frontend/src/components/__tests__/TodoList.test.js
+- [X] T005 [P] [US1] Add a failing modern-fake-timer integration test for initial local-date propagation, automatic midnight rollover, no rollover API request, and timeout cleanup in packages/frontend/src/__tests__/App.test.js
 
 ### Implementation for User Story 1
 
-- [ ] T006 [US1] Implement pure getCurrentLocalDate, getMillisecondsUntilNextLocalMidnight, and isOverdue exports with strict canonical calendar validation in packages/frontend/src/utils/dateUtils.js
-- [ ] T007 [US1] Derive overdue state during render, apply the overdue class, and render visible `Overdue` text near the due date without changing existing accessible controls in packages/frontend/src/components/TodoCard.js
-- [ ] T008 [US1] Add the currentDate prop and forward it unchanged to every TodoCard while preserving todo order and existing handlers in packages/frontend/src/components/TodoList.js
-- [ ] T009 [US1] Initialize currentDate, own one self-rescheduling local-midnight timeout with unmount cleanup, and pass currentDate to TodoList in packages/frontend/src/App.js
-- [ ] T010 [US1] Add theme-token-based overdue card and text styling with a non-color visual cue, completed-state precedence, and responsive readability in packages/frontend/src/App.css
-- [ ] T011 [US1] Run the focused US1 suites for packages/frontend/src/utils/__tests__/dateUtils.test.js, packages/frontend/src/components/__tests__/TodoCard.test.js, packages/frontend/src/components/__tests__/TodoList.test.js, and packages/frontend/src/__tests__/App.test.js
+- [X] T006 [US1] Implement pure getCurrentLocalDate, getMillisecondsUntilNextLocalMidnight, and isOverdue exports with strict canonical calendar validation in packages/frontend/src/utils/dateUtils.js
+- [X] T007 [US1] Derive overdue state during render, apply the overdue class, and render visible `Overdue` text near the due date without changing existing accessible controls in packages/frontend/src/components/TodoCard.js
+- [X] T008 [US1] Add the currentDate prop and forward it unchanged to every TodoCard while preserving todo order and existing handlers in packages/frontend/src/components/TodoList.js
+- [X] T009 [US1] Initialize currentDate, own one self-rescheduling local-midnight timeout with unmount cleanup, and pass currentDate to TodoList in packages/frontend/src/App.js
+- [X] T010 [US1] Add theme-token-based overdue card and text styling with a non-color visual cue, completed-state precedence, and responsive readability in packages/frontend/src/App.css
+- [X] T011 [US1] Run the focused US1 suites for packages/frontend/src/utils/__tests__/dateUtils.test.js, packages/frontend/src/components/__tests__/TodoCard.test.js, packages/frontend/src/components/__tests__/TodoList.test.js, and packages/frontend/src/__tests__/App.test.js
 
 **Checkpoint**: User Story 1 is fully functional and independently testable as the MVP.
 
@@ -71,13 +71,13 @@ No foundational code changes are required. The existing React state flow, REST r
 
 ### Tests for User Story 2
 
-- [ ] T012 [P] [US2] Add failing rerender coverage for completion, reopening, and past/today/future/null due-date transitions while retaining due-date display in packages/frontend/src/components/__tests__/TodoCard.test.js
-- [ ] T013 [P] [US2] Add failing integration coverage for immediate overdue removal/restoration from PATCH toggle and PUT edit responses without changing list order in packages/frontend/src/__tests__/App.test.js
+- [X] T012 [P] [US2] Add failing rerender coverage for completion, reopening, and past/today/future/null due-date transitions while retaining due-date display in packages/frontend/src/components/__tests__/TodoCard.test.js
+- [X] T013 [P] [US2] Add failing integration coverage for immediate overdue removal/restoration from PATCH toggle and PUT edit responses without changing list order in packages/frontend/src/__tests__/App.test.js
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Use functional todo state updates for create, toggle, edit, and delete responses so mutation-driven overdue reclassification cannot be lost to stale list closures in packages/frontend/src/App.js
-- [ ] T015 [US2] Run the focused transition suites for packages/frontend/src/components/__tests__/TodoCard.test.js and packages/frontend/src/__tests__/App.test.js
+- [X] T014 [US2] Use functional todo state updates for create, toggle, edit, and delete responses so mutation-driven overdue reclassification cannot be lost to stale list closures in packages/frontend/src/App.js
+- [X] T015 [US2] Run the focused transition suites for packages/frontend/src/components/__tests__/TodoCard.test.js and packages/frontend/src/__tests__/App.test.js
 
 **Checkpoint**: User Stories 1 and 2 both work, and all required overdue transitions are covered.
 
@@ -87,9 +87,9 @@ No foundational code changes are required. The existing React state flow, REST r
 
 **Purpose**: Validate accessibility, themes, regressions, and documented acceptance behavior across the completed feature.
 
-- [ ] T016 [P] Verify overdue text, contrast, focus visibility, control readability, and layout in both themes at 375px, 768px, and 1280px, adjusting packages/frontend/src/App.css if needed
-- [ ] T017 Run the full frontend and backend regression and coverage commands defined in package.json, packages/frontend/package.json, and packages/backend/package.json and confirm at least 80% package coverage with no REST or workflow regressions
-- [ ] T018 Execute every automated and manual scenario in specs/001-overdue-todo-items/quickstart.md and update that file with any corrected validation commands or discovered limitations
+- [X] T016 [P] Verify overdue text, contrast, focus visibility, control readability, and layout in both themes at 375px, 768px, and 1280px, adjusting packages/frontend/src/App.css if needed
+- [X] T017 Run the full frontend and backend regression and coverage commands defined in package.json, packages/frontend/package.json, and packages/backend/package.json and confirm at least 80% package coverage with no REST or workflow regressions
+- [X] T018 Execute every automated and manual scenario in specs/001-overdue-todo-items/quickstart.md and update that file with any corrected validation commands or discovered limitations
 
 ---
 

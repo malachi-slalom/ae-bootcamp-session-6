@@ -59,4 +59,28 @@ describe('TodoList Component', () => {
     expect(screen.getAllByLabelText(/Edit/)).toHaveLength(2);
     expect(screen.getAllByLabelText(/Delete/)).toHaveLength(2);
   });
+
+  it('classifies every card against one date while preserving input order', () => {
+    const todos = [
+      { ...mockTodos[0], id: 3, title: 'Past', dueDate: '2025-12-24' },
+      { ...mockTodos[0], id: 2, title: 'Today', dueDate: '2025-12-25' },
+      { ...mockTodos[0], id: 1, title: 'Future', dueDate: '2025-12-26' },
+    ];
+    const { container } = render(
+      <TodoList
+        todos={todos}
+        {...mockHandlers}
+        currentDate="2025-12-25"
+        isLoading={false}
+      />
+    );
+
+    expect(screen.getAllByRole('heading').map((heading) => heading.textContent)).toEqual([
+      'Past',
+      'Today',
+      'Future',
+    ]);
+    expect(screen.getByText('Overdue')).toBeVisible();
+    expect(container.querySelectorAll('.todo-card.overdue')).toHaveLength(1);
+  });
 });
